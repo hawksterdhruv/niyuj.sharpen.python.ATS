@@ -2,10 +2,10 @@ from sqlalchemy import Column, Integer, String, Text, BLOB, ForeignKey, create_e
 from sqlalchemy.orm import relationship,sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 #from flaskext.jsontools import JsonSerializableBase
-from flask import json,jsonify
+from flask import json,jsonify, request
 from app import app
 
-engine = create_engine("mysql+pymysql://mysqluser:user@123@localhost:3306/ats")
+engine = create_engine("mysql+pymysql://root:tos1byte@localhost:3306/ats")
 connection=engine.connect()
 Base = declarative_base()
 Session = sessionmaker(bind = engine)
@@ -71,7 +71,7 @@ class Candidate(Base):
 
     notice_period = Column(Integer)
 
-    def __init__(self,name,skills,experience,email,address,mobileno,source,reffered_by,resume,status,current_ctc,expected_ctc,current_organization,notice_period):
+    def __init__(self,name=None, skills=None,experience=None,email=None,address=None,mobileno=None,source=None,reffered_by=None,resume=None,status=None,current_ctc=None,expected_ctc=None,current_organization=None,notice_period=None):
 
         self.name=name
         self.email=email
@@ -107,16 +107,32 @@ class Candidate(Base):
          'notice_period' : self.notice_period
         }
 
+    def deserialize(self, candidate_json):
+        self.id = candidate_json.get('id')
+        self.name = candidate_json.get('name')
+        self.email = candidate_json.get('email')
+        self.address = candidate_json.get('address')
+        self.mobileno = candidate_json.get('mobileno')
+        self.skills = candidate_json.get('skills')
+        self.experience = candidate_json.get('experience')
+        self.source = candidate_json.get('source')
+        self.reffered_by = candidate_json.get('reffered_by')
+        self.resume = candidate_json.get('resume').encode()
+        self.status = candidate_json.get('status')
+        self.current_ctc = candidate_json.get('current_ctc')
+        self.expected_ctc = candidate_json.get('expected_ctc')
+        self.current_organization = candidate_json.get('current_organization')
+        self.notice_period = candidate_json.get('notice_period')
+
 @app.route("/add", methods = ["POST"])
 def Insert():
-    e=session.query(Employee).first()
-
-    c1= Candidate("ABC","java,c,cpp",3,"abc@gmail.com","Pune","9087650987","referral",e.id,bytes(json.dumps("/home/user1/PycharmProjects/ats/a.txt"), 'utf8'),"Shortlisted",4,6,"niyuj",15)
-    c2= Candidate("Shyamlee","c,cpp",5,"shyamlee@gmail.com","Pune","8907654908","referral",e.id,bytes(json.dumps("/home/user1/PycharmProjects/ats/a.txt"), 'utf8'),"Selected",7,10,"niyuj",10)
-
-    session.add(c1)
-    session.add(c2)
+    body = request.get_json()
+    print(body)
+    c =Candidate()
+    c.deserialize(body)
+    session.add(c)
     session.commit()
+    return jsonify(c.serialize())
 
 
 @app.route('/all', methods=["GET"])
