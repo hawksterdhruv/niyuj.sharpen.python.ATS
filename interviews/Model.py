@@ -30,7 +30,7 @@ class Interview(Base):
         self.location = data['location']
         self.comment = data['comment']
         self.feedback = data['feedback']
-        self.schedule_time = datetime.strptime(data['schedule_time'], '%m/%d/%y %H:%M:%S')
+        self.schedule_time = datetime.strptime(data['schedule_time'], '%d/%m/%Y, %H:%M:%S')
 
 
     def serialize(self):
