@@ -31,6 +31,13 @@ def get_interviews():
 def get_interview(id):
     return jsonify(db_session.query(Interview).get(id).serialize())
 
+@app.route('/interviews/<id>', methods = ['DELETE'])
+def delete_interview(id):
+    x = db_session.query(Interview).get(id)
+    db_session.delete(x)
+    db_session.commit()
+    return {"status": "OK"}
+
 @app.route('/interviews/schedule', methods = ['POST'])
 def post_interview():
    content = request.get_json()
