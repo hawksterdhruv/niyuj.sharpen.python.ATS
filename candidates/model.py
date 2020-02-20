@@ -1,15 +1,11 @@
-from sqlalchemy import Column, Integer, String, Text, BLOB, ForeignKey, create_engine, select
-from sqlalchemy.orm import relationship,sessionmaker
+from sqlalchemy import Column, Integer, String, Text, BLOB, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-#from flaskext.jsontools import JsonSerializableBase
-from flask import json,jsonify, request
-from app import app
 
-engine = create_engine("mysql+pymysql://root:tos1byte@localhost:3306/ats")
-connection=engine.connect()
+
 Base = declarative_base()
-Session = sessionmaker(bind = engine)
-session = Session()
+#Session = sessionmaker(bind = engine)
+#session = Session()
 
 
 class Employee(Base):
@@ -71,6 +67,9 @@ class Candidate(Base):
 
     notice_period = Column(Integer)
 
+    #Relationship
+    #reference = relationship("Employee",back_populates="candidate")
+
     def __init__(self,name=None, skills=None,experience=None,email=None,address=None,mobileno=None,source=None,reffered_by=None,resume=None,status=None,current_ctc=None,expected_ctc=None,current_organization=None,notice_period=None):
 
         self.name=name
@@ -123,28 +122,3 @@ class Candidate(Base):
         self.expected_ctc = candidate_json.get('expected_ctc')
         self.current_organization = candidate_json.get('current_organization')
         self.notice_period = candidate_json.get('notice_period')
-
-@app.route("/add", methods = ["POST"])
-def Insert():
-    body = request.get_json()
-    print(body)
-    c =Candidate()
-    c.deserialize(body)
-    session.add(c)
-    session.commit()
-    return jsonify(c.serialize())
-
-
-@app.route('/all', methods=["GET"])
-def Show():
-        tmp_list = []
-        try:
-            stmt = session.query(Candidate).all()
-            for result in stmt:
-                tmp_list.append(result.serialize())
-        except Exception as e:
-            print(e)
-        return jsonify(tmp_list)
-
-if __name__ == "__main__":
-    app.run(debug=True)
