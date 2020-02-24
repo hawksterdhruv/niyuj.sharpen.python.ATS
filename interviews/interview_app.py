@@ -1,6 +1,6 @@
-from SetupDb import db_session
-import SetupDb
-from Model import Interview
+from interviews.SetupDb import db_session
+import interviews.SetupDb
+from interviews.Model import Interview
 import datetime
 from datetime import datetime, timedelta
 
@@ -11,7 +11,7 @@ import json
 
 app = Flask(__name__)
 
-SetupDb.init_db()
+interviews.SetupDb.init_db()
 # dummyInterviewdata = Interview(2,2,"F2F", "Niyuj HQ", "NA", "NA", datetime.datetime.now())
 #
 # db_session.add(dummyInterviewdata)
@@ -68,6 +68,22 @@ def get_interview_by_date(days):
     for value in results:
         date_list.append(value.serialize())
     return jsonify(date_list)
+
+@app.route('/interviews/<id>', methods = ['PATCH'])
+def patch_interview(id):
+    content = request.get_json()
+    db_value = db_session.query(Interview).get(id)
+    key_list = content.keys()
+    if 'channel' in key_list:
+        db_value.channel=content['channel']
+    if 'location' in key_list:
+        db_value.location = content['location']
+    if 'comment' in key_list:
+        db_value.comment = content['comment']
+    if 'feedback' in key_list:
+        db_value.feedback = content['feedback']
+    db_session.commit()
+    return "Row updated"
 
 
 if __name__ == '__main__':

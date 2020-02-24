@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///ats.db', convert_unicode=True)
+engine = create_engine('mysql+pymysql://root:Abcd123456@localhost/ats', convert_unicode=True)
 Base = declarative_base()
 
 
