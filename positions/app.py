@@ -5,9 +5,6 @@ from sqlalchemy.orm import relationship, Session, sessionmaker
 
 app = Flask(__name__)
 
-positions = []
-positionId = 1
-
 Session = sessionmaker(bind=create_connection())
 session = Session()
 
