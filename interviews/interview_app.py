@@ -1,6 +1,7 @@
-from interviews.SetupDb import db_session
-import interviews.SetupDb
-from interviews.Model import Interview
+from SetupDb import db_session
+import SetupDb
+#from interview_model import Interview
+from models import Interview
 import datetime
 from datetime import datetime, timedelta
 
@@ -11,7 +12,7 @@ import json
 
 app = Flask(__name__)
 
-interviews.SetupDb.init_db()
+SetupDb.init_db()
 # dummyInterviewdata = Interview(2,2,"F2F", "Niyuj HQ", "NA", "NA", datetime.datetime.now())
 #
 # db_session.add(dummyInterviewdata)

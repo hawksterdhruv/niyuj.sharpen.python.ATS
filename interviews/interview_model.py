@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from interviews.SetupDb import Base
+from SetupDb import Base
 import json
 from datetime import datetime
 
