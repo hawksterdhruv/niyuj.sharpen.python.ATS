@@ -138,13 +138,27 @@ class JobPosition(Base):
     @property
     def serialize(self):
         return {
+            "id": self.id,
             "title": self.title,
             "experience": self.experience,
             "skills": self.skills,
             "no_of_openings": self.no_of_openings,
             "status": self.no_of_openings,
             "grade": self.grade,
+            "employee_id":self.employee_id,
+            "project_id":self.project_id
         }
+
+    @property
+    def deserialize(self, data):
+        self.employee_id = data['employee_id']
+        self.title = data['title']
+        self.experience = data['experience']
+        self.skills = data['skills']
+        self.no_of_openings = data['no_of_openings']
+        self.status = data['status']
+        self.grade = data['grade']
+        self.project_id = data['project_id']
 
 
 class JobHasCandidate(Base):
