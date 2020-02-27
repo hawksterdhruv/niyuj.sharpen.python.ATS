@@ -1,9 +1,21 @@
 from flask import Flask, request, jsonify, abort, make_response
 import json
-from Model import Project, JobPosition, create_connection
+from models import Project, JobPosition
 from sqlalchemy.orm import relationship, Session, sessionmaker
+from sqlalchemy import create_engine
 
 app = Flask(__name__)
+
+def create_connection():
+    engine = None
+    try:
+        engine = create_engine("mysql+pymysql://root:QA@vnet1@localhost/ats")
+        connection = engine.connect()
+        print("Connection successful")
+        return connection
+    except Exception as e:
+        print(e)
+        print("Unable to create connection")
 
 Session = sessionmaker(bind=create_connection())
 session = Session()
@@ -95,7 +107,7 @@ def update_position_by_id(id):
     return json.dumps(jobPosition.serialize())
 
 
-@app.route('/positions/delete/<id>', methods=['DELETE'])
+@app.route('/positions/<id>', methods=['DELETE'])
 def delete_position_by_id(id):
     jobPosition = session.query(JobPosition).get(id)
     session.delete(jobPosition)
