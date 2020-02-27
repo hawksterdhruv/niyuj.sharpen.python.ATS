@@ -107,7 +107,7 @@ def update_position_by_id(id):
     return json.dumps(jobPosition.serialize())
 
 
-@app.route('/positions/delete/<id>', methods=['DELETE'])
+@app.route('/positions/<id>', methods=['DELETE'])
 def delete_position_by_id(id):
     jobPosition = session.query(JobPosition).get(id)
     session.delete(jobPosition)
