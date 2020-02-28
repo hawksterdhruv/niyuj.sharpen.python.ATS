@@ -1,7 +1,7 @@
 from SetupDb import db_session
 import SetupDb
 #from interview_model import Interview
-from models import Interview
+from models import Interview , JobHasCandidate , JobPosition
 import datetime
 from datetime import datetime, timedelta
 
@@ -20,8 +20,6 @@ SetupDb.init_db()
 # db_session.commit()
 
 
-
-
 @app.route('/interviews')
 def get_interviews():
     interviews = db_session.query(Interview).all()
@@ -30,9 +28,41 @@ def get_interviews():
         interview_list.append(interview.serialize())
     return jsonify(interview_list)
 
+
+@app.route('/interviews/candidate/<candi_id>')
+def get_interviews_by_candidate_id(candi_id):
+    interview_list = []
+    # Get entries from JobHasCandidate table for the specific candidate id
+    return_interview = db_session.query(JobHasCandidate).filter(JobHasCandidate.candidate_id == candi_id)
+    for row in return_interview:
+      jhcid = row.id
+      # get list of interviews for that job_has_candidate_id
+      result = db_session.query(Interview).filter(Interview.job_has_candidate_id == jhcid)
+      # Loop through  interview list, convert to json and add to result list
+      for interview in result:
+          interview_list.append(interview.serialize())
+    return jsonify(interview_list)
+
+
+@app.route('/interviews/job/<job_id>')
+def get_interviews_by_job_id(job_id):
+    interview_list1 = []
+    return_job = db_session.query(JobHasCandidate).filter(JobHasCandidate.position_id == job_id)
+    for row in return_job:
+      jhcid = row.id
+      print(jhcid)
+      # get list of interviews for that job_has_candidate_id
+      result11 = db_session.query(Interview).filter(Interview.job_has_candidate_id == jhcid)
+      # Loop through  interview list, convert to json and add to result list
+      for interview in result11:
+          interview_list1.append(interview.serialize())
+    return jsonify(interview_list1)
+
+
 @app.route('/interviews/<id>')
 def get_interview(id):
     return jsonify(db_session.query(Interview).get(id).serialize())
+
 
 @app.route('/interviews/<id>', methods = ['DELETE'])
 def delete_interview(id):
