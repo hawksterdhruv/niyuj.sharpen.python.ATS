@@ -1,5 +1,5 @@
 from SetupDb import db_session
-import SetupDb
+ import SetupDb
 #from interview_model import Interview
 from models import Interview
 import datetime
@@ -87,6 +87,14 @@ def patch_interview(id):
     db_session.commit()
     return "Row updated"
 
+@app.route('/interviews/<id>', methods = ['PUT'])
+def put_interview(id):
+    content = request.get_json()
+    delete_interview(id)
+    interviewObj = Interview(content,id)
+    db_session.add(interviewObj)
+    db_session.commit()
+    return {"id": interviewObj.id, "status": "Updated"}
 
 if __name__ == '__main__':
    app.run(debug = True)
