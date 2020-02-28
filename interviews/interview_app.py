@@ -1,5 +1,5 @@
 from SetupDb import db_session
-import SetupDb
+ import SetupDb
 #from interview_model import Interview
 from models import Interview , JobHasCandidate , JobPosition
 import datetime
@@ -9,11 +9,11 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 import json
-#from flask_cors import CORS
+from flask_cors import CORS
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 
-SetupDb.init_db()
+#SetupDb.init_db()
 # dummyInterviewdata = Interview(2,2,"F2F", "Niyuj HQ", "NA", "NA", datetime.datetime.now())
 #
 # db_session.add(dummyInterviewdata)
@@ -117,6 +117,14 @@ def patch_interview(id):
     db_session.commit()
     return "Row updated"
 
+@app.route('/interviews/<id>', methods = ['PUT'])
+def put_interview(id):
+    content = request.get_json()
+    delete_interview(id)
+    interviewObj = Interview(content,id)
+    db_session.add(interviewObj)
+    db_session.commit()
+    return {"id": interviewObj.id, "status": "Updated"}
 
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(port=4000)

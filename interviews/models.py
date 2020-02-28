@@ -167,7 +167,9 @@ class Interview(Base):
     job_has_candidate = relationship(JobHasCandidate, back_populates="interviews", uselist=False)
     employee = relationship(Employee, back_populates="interviews", uselist=False)
 
-    def __init__(self, data):
+    def __init__(self, data, interview_id= None):
+        if interview_id is not None:
+            self.id = interview_id
         self.job_has_candidate_id = data["job_has_candidate_id"]
         self.employee_id = data["employee_id"]
         self.channel = data["channel"]
