@@ -9,11 +9,11 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 import json
-#from flask_cors import CORS
+from flask_cors import CORS
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 
-SetupDb.init_db()
+#SetupDb.init_db()
 # dummyInterviewdata = Interview(2,2,"F2F", "Niyuj HQ", "NA", "NA", datetime.datetime.now())
 #
 # db_session.add(dummyInterviewdata)
@@ -97,4 +97,4 @@ def put_interview(id):
     return {"id": interviewObj.id, "status": "Updated"}
 
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(port=4000)
