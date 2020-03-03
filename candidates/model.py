@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, BLOB, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-
+import enum
 
 Base = declarative_base()
 #Session = sessionmaker(bind = engine)
@@ -32,7 +32,6 @@ class Employee(Base):
         self.address = address
         self.mobileno = mobileno
 
-
 class Candidate(Base):
     __tablename__ = "candidate"
 
@@ -51,18 +50,16 @@ class Candidate(Base):
                   nullable=True)
     experience = Column(Integer,
                   nullable=False)
-    source = Column(String(100))
+    source = Column(String(30),nullable=True)
     reffered_by = Column(Integer,
                    ForeignKey('employee.id'),
                    nullable=False)
-    resume = Column(BLOB,
+    resume = Column(String(50),
                   nullable=False)
-    status = Column(String(100),
-                  nullable=False)
-    current_ctc = Column(Integer,
-                         nullable=False)
-    expected_ctc = Column(Integer,
-                         nullable=False)
+    status = Column(String(30),
+                  nullable=True)
+    current_ctc = Column(Integer)
+    expected_ctc = Column(Integer)
     current_organization = Column(String(100))
 
     notice_period = Column(Integer)
@@ -98,7 +95,7 @@ class Candidate(Base):
          'experience' : self.experience,
          'source' : self.source,
          'reffered_by' : self.reffered_by,
-         #'resume' : self.resume,
+         'resume' : self.resume,
          'status' : self.status,
          'current_ctc' : self.current_ctc,
          'expected_ctc' : self.expected_ctc,
@@ -116,7 +113,7 @@ class Candidate(Base):
         self.experience = candidate_json.get('experience')
         self.source = candidate_json.get('source')
         self.reffered_by = candidate_json.get('reffered_by')
-        self.resume = candidate_json.get('resume').encode()
+        self.resume = candidate_json.get('resume')
         self.status = candidate_json.get('status')
         self.current_ctc = candidate_json.get('current_ctc')
         self.expected_ctc = candidate_json.get('expected_ctc')

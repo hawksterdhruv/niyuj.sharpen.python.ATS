@@ -4,8 +4,11 @@ from model import Employee,Candidate
 from sqlalchemy.orm import sessionmaker
 from flask import json,jsonify,request
 from db import session
+from flask_cors import CORS
+import json
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def home():
@@ -53,6 +56,13 @@ def candidate_all():
              tmp_list.append(result.serialize())
         return jsonify(tmp_list)
 
+'''
+@app.route('/candidates/source/<source_id>', methods=['GET'])
+def get_candidate_by_source(source_id):
+    result=session.query(Candidate).filter_by(source=source_id).all()
+    return jsonify(result.serialize_list())
+'''
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.',port=6000,debug=True)
+
