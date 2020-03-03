@@ -50,7 +50,6 @@ Base = declarative_base()
 
 #         return fields
 
-
 class Employee(Base):
     __tablename__ = "employee"
     id = Column(Integer, primary_key=True)
@@ -59,6 +58,7 @@ class Employee(Base):
     address = Column(String(200), nullable=False)
     mobileno = Column(String(200), nullable=False)
     job_positions = relationship("JobPosition", back_populates="employee")
+    #interview_ref = relationship(Interview)
 
     def __init__(self, name, email, address, mobileno):
         self.name = name
@@ -152,31 +152,24 @@ class JobHasCandidate(Base):
     id = Column(Integer, primary_key=True)
     candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0)
     position_id = Column(Integer, ForeignKey("job_position.id"), default=0)
-
+    #interview_ref = relationship(Interview)
 
 class Interview(Base):
     __tablename__ = "interview"
     id = Column("id", Integer, primary_key=True)
-    job_has_candidate_id = Column(
-        "job_has_candidate_id", Integer
-    )  # ForeignKey('job_has_candidate.id')
-    employee_id = Column("employee_id", Integer)  # ForeignKey('employee.id')
+    job_has_candidate_id = Column("job_has_candidate_id", Integer, ForeignKey('job_has_candidate.id'))
+    employee_id = Column("employee_id", Integer, ForeignKey('employee.id'))
     channel = Column("channel", String(50))
     location = Column("location", String(50))
     comment = Column("comment", String(50), nullable=True)
     feedback = Column("feedback", String(50), nullable=True)
     schedule_time = Column("schedule_time", DateTime)
+    job_has_candidate = relationship(JobHasCandidate, back_populates="interviews", uselist=False)
+    employee = relationship(Employee, back_populates="interviews", uselist=False)
 
-    # def __init__(self, job_has_candidate_id, employee_id, channel,location, comment, feedback, schedule_time):
-    #     self.job_has_candidate_id = job_has_candidate_id
-    #     self.employee_id = employee_id
-    #     self.channel = channel
-    #     self.location = location
-    #     self.comment = comment
-    #     self.feedback = feedback
-    #     self.schedule_time = schedule_time
-
-    def __init__(self, data):
+    def __init__(self, data, interview_id= None):
+        if interview_id is not None:
+            self.id = interview_id
         self.job_has_candidate_id = data["job_has_candidate_id"]
         self.employee_id = data["employee_id"]
         self.channel = data["channel"]
@@ -196,3 +189,6 @@ class Interview(Base):
             "feedback": self.feedback,
             "schedule_time": self.schedule_time,
         }
+
+JobHasCandidate.interviews = relationship(Interview, order_by = Interview.id, back_populates="job_has_candidate", uselist=False)
+Employee.interviews = relationship(Interview, order_by = Interview.id, back_populates="employee", uselist=False)
