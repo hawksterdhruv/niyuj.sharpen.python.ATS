@@ -189,7 +189,6 @@ class JobPosition(Base):
             "project_id":self.project_id
         }
 
-    @property
     def deserialize(self, data):
         self.employee_id = data['employee_id']
         self.title = data['title']

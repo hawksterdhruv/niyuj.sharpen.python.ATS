@@ -29,7 +29,7 @@ def get_positions():
     result = session.query(JobPosition).all()
     for row in result:
         resList.append(row.serialize)
-    return json.dumps(resList)
+    return jsonify(resList)
 
 
 @app.route('/positions', methods=['POST'])
@@ -103,7 +103,7 @@ def update_position_by_id(id):
         jobPosition.employee_id = data['employee_id']
 
     session.commit()
-    return json.dumps(jobPosition.serialize)
+    return jsonify(jobPosition.serialize)
 
 
 @app.route('/positions/<id>', methods=['DELETE'])
