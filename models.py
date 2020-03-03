@@ -167,7 +167,7 @@ class JobPosition(Base):
     project = relationship(Project, back_populates="job_positions", uselist=False)
     employee = relationship(Employee, back_populates="job_positions", uselist=False)
 
-    def __init__(self, title, experience, skill, no_of_openings, status, grade):
+    def __init__(self, title=None, experience=None, skill=None, no_of_openings=None, status=None, grade=None):
         self.title = title
         self.experience = experience
         self.skills = skill
