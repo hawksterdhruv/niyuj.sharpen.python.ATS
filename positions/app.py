@@ -44,7 +44,7 @@ def create_position():
 @app.route('/positions/<id>', methods=['GET'])
 def get_position_by_id(id):
     result = session.query(JobPosition).get(id)
-    return json.dumps(result.serialize)
+    return jsonify(result.serialize)
 
 
 @app.route('/positions/skill/<skills>', methods=['GET'])
@@ -53,7 +53,7 @@ def get_position_by_skill(skills):
     # result = session.query(JobPosition).filter_by(skills=skills)
     result = session.query(JobPosition).filter(JobPosition.skills.contains(skills))
     for row in result:
-        resList.append(row.serialize())
+        resList.append(row.serialize)
     return jsonify(resList)
 
 @app.route('/positions/grade/<grade>', methods=['GET'])
