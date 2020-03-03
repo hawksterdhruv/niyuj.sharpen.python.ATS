@@ -8,18 +8,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-def create_connection():
-    engine = None
-    try:
-        engine = create_engine("mysql+pymysql://root:QA@vnet1@localhost/ats")
-        connection = engine.connect()
-        print("Connection successful")
-        return connection
-    except Exception as e:
-        print(e)
-        print("Unable to create connection")
 
-Session = sessionmaker(bind=create_connection())
+engine = create_engine("mysql+pymysql://root:tos1byte@localhost/ats")
+Session = sessionmaker(bind=engine)
 session = Session()
 
 
