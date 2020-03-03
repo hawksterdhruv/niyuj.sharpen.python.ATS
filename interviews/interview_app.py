@@ -14,7 +14,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-SetupDb.init_db()
+#SetupDb.init_db()
 # dummyInterviewdata = Interview(2,2,"F2F", "Niyuj HQ", "NA", "NA", datetime.datetime.now())
 #
 # db_session.add(dummyInterviewdata)
