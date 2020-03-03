@@ -1,6 +1,6 @@
 from flask import Flask
 from sqlalchemy import create_engine,update
-from model import Employee,Candidate
+from models import Employee,Candidate,JobHasCandidate
 from sqlalchemy.orm import sessionmaker
 from flask import json,jsonify,request
 from db import session
@@ -56,13 +56,18 @@ def candidate_all():
              tmp_list.append(result.serialize())
         return jsonify(tmp_list)
 
-'''
-@app.route('/candidates/source/<source_id>', methods=['GET'])
-def get_candidate_by_source(source_id):
-    result=session.query(Candidate).filter_by(source=source_id).all()
-    return jsonify(result.serialize_list())
-'''
+#Create Job_Has_Candidate
+@app.route("/job_has_candidate", methods = ["POST"])
+def post_job_has_candidate():
+    body = request.get_json()
+    print(body)
+    c =JobHasCandidate()
+    c.deserialize(body)
+    session.add(c)
+    session.commit()
+    return jsonify(c.serialize())
+
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.',port=6000,debug=True)
+    app.run(host='0.0.0.0',port=6000,debug=True)
 

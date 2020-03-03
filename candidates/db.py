@@ -6,7 +6,7 @@ USERNAME="root"
 PASSWORD="tos1byte"
 DATABASE="ats"
 
-engine = create_engine("mysql+pymysql://"+USERNAME+":"+PASSWORD+"@"+HOST+":"+"/"+DATABASE)
+engine = create_engine("mysql+pymysql://"+USERNAME+":"+PASSWORD+"@"+HOST+"/"+DATABASE)
 connection=engine.connect()
 Session = sessionmaker(bind =engine)
 session = Session()
