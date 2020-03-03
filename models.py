@@ -1,7 +1,7 @@
 from datetime import datetime
 from pprint import pprint
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import json
@@ -12,44 +12,6 @@ from sqlalchemy.pool import StaticPool
 
 # from model import *
 Base = declarative_base()
-
-
-# class BaseModel(Base):
-#     __abstract__ = True
-#     ignore_field = ['get_or_create', 'ignore_field','serialize']
-
-#     @classmethod
-#     def get_or_create(cls, sess,  **kwargs):
-#         instance = sess.query(cls).filter_by(**kwargs).first()
-
-#         if instance:
-#             return instance, False
-#         else:
-#             instance = cls(**kwargs)
-#             sess.add(instance)
-#             return instance, True
-
-#     def serialize(self):
-#         fields = {}
-#         for field in [x for x in dir(self) if not x.startswith('_') and x != 'metadata']:
-#             if field in self.ignore_field:
-#                 continue
-#             data = self.__getattribute__(field)
-#             try:
-#                 if isinstance(data, datetime):
-#                     data = data.strftime('%Y-%m-%d')
-#                 json.dumps(data)  # this will fail on non-encodable values, like other classes
-#                 fields[field] = data
-#             except TypeError:
-#                 try:
-#                     json.dumps(data.name)  # this will fail on non-encodable values, like other classes
-#                     fields[field] = data.name
-#                 except TypeError:
-#                     print(type(data))
-#                     fields[field] = None
-
-#         return fields
-
 
 class Employee(Base):
     __tablename__ = "employee"
@@ -68,6 +30,7 @@ class Employee(Base):
 
     # relationship
     candidate_ref = relationship("Candidate", backref="reference")
+    job_positions = relationship('JobPosition', back_populates="employee")
 
     def __init__(self, name, email, address, mobileno):
         self.name = name
@@ -258,7 +221,9 @@ class Interview(Base):
     job_has_candidate = relationship(JobHasCandidate, back_populates="interviews", uselist=False)
     employee = relationship(Employee, back_populates="interviews", uselist=False)
 
-    def __init__(self, data):
+    def __init__(self, data, interview_id= None):
+        if interview_id is not None:
+            self.id = interview_id
         self.job_has_candidate_id = data["job_has_candidate_id"]
         self.employee_id = data["employee_id"]
         self.channel = data["channel"]
@@ -278,7 +243,7 @@ class Interview(Base):
             "feedback": self.feedback,
             "schedule_time": self.schedule_time,
         }
-        
+
 JobHasCandidate.interviews = relationship(Interview, order_by = Interview.id, back_populates="job_has_candidate", uselist=False)
 Employee.interviews = relationship(Interview, order_by = Interview.id, back_populates="employee", uselist=False)
 
@@ -294,40 +259,3 @@ if __name__ == "__main__":
 
     for a in session.query(Employee).all():
         print(a.serialize())
-    # p = Project("EdgeView")
-    # q = Project("EdgeMarc")
-
-    # # c = Candidate()
-    # # c.name = ''
-    # # c.mobileno = ''
-
-    # session.add(p)
-    # session.add(q)
-
-    # m = Employee("rhishekesh", "rhishekesh.magdum@niyuj.com", "Hinjewadi,Pune", "8890764732")
-    # n = Employee("supriya", "supriya.karkhile@niyuj.com", "Baner,PUne", "1234567890")
-    # session.add(m)
-    # session.add(n)
-
-    # p = session.query(Project).first()
-    # m = session.query(Employee).first()
-    # print(p.name)
-    # print(m.name)
-    # print(m.serialize)
-
-    # l = session.query(JobPosition).first()
-    # print(l.serialize)
-    # print(l.project.serialize)
-    # print(l.employee.serialize)
-    # l = JobPosition(
-    # "Java Backend Developer II", 4, "Java, Servlets, Web Servers, Sockets", 3, "Open", "B"
-    # )
-    # l.employee = m
-    # l.project = p
-
-    # # print(p, m)
-    # session.add(l)
-    # session.commit()
-
-    # j = sessio-ployee.serialize)
-    # j = session()
