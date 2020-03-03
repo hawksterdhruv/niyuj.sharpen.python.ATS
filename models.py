@@ -191,13 +191,13 @@ class Project(Base):
 
 class JobPosition(Base):
     __tablename__ = "job_position"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(200), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(50), nullable=False)
     experience = Column(Integer, nullable=False)
-    skills = Column(String(200), nullable=False)
+    skills = Column(String(255), nullable=False)
     no_of_openings = Column(Integer, nullable=False, default=1)
-    status = Column(String(200), nullable=False, default="OPEN")
-    grade = Column(String(200), nullable=False)
+    status = Column(String(30), nullable=False, default="OPEN")
+    grade = Column(String(5), nullable=False)
     project_id = Column(Integer, ForeignKey("project.id"))
     employee_id = Column(Integer, ForeignKey("employee.id"))  # Hiring manager id
 
