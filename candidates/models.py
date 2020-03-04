@@ -205,9 +205,9 @@ class JobHasCandidate(Base):
     id = Column(Integer, primary_key=True)
     candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0)
     position_id = Column(Integer, ForeignKey("job_position.id"), default=0)
-
-     #Relationship
-    candidate = relationship("Candidate", back_populates="job_has_candidate")
+    # Relationship
+    candidate = relationship(Candidate, back_populates="job_has_candidate")
+    interviews = relationship("Interview",back_populates="job_has_candidate")
 
     def __init__(self,candidate_id=None, position_id=None):
         self.candidate_id=candidate_id

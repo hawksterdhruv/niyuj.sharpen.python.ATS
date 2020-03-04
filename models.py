@@ -82,7 +82,7 @@ class Candidate(Base):
     notice_period = Column(Integer)
 
     #Relationship
-    job_has_candidate = relationship("Job_Has_Candidate",back_populates="candidate")
+    job_has_candidate = relationship("JobHasCandidate",back_populates="candidate")
 
     def __init__(self,name=None, skills=None,experience=None,email=None,address=None,mobileno=None,source=None,reffered_by=None,resume=None,status=None,current_ctc=None,expected_ctc=None,current_organization=None,notice_period=None):
 
@@ -206,7 +206,8 @@ class JobHasCandidate(Base):
     candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0)
     position_id = Column(Integer, ForeignKey("job_position.id"), default=0)
     # Relationship
-    candidate = relationship("Candidate", back_populates="job_has_candidate")
+    candidate = relationship(Candidate, back_populates="job_has_candidate")
+    interviews = relationship("Interview",back_populates="job_has_candidate")
 
     def __init__(self,candidate_id=None, position_id=None):
         self.candidate_id=candidate_id
