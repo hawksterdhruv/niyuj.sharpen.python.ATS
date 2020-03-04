@@ -84,18 +84,6 @@ def post_interview():
    db_session.commit()
    return {"id": interviewObj.id,"status": "OK"}
 
-@app.route('/interviews/schedule/<id>', methods = ['PUT'])
-def update_interview(id):
-   content = request.get_json()
-   interviewUpdatedObj = Interview(content)
-   # interviewObj.id = id
-   # db_session.add(interviewObj)
-   interviewObj = db_session.query(Interview).get(id)
-   interviewObj = interviewUpdatedObj
-   db_session.commit()
-   return {"id": interviewObj.id,"status": "OK"}
-
-
 @app.route('/interviews/days/<days>')
 def get_interview_by_date(days):
     current_date = datetime.now()

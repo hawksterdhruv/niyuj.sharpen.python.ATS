@@ -82,7 +82,7 @@ class Candidate(Base):
     notice_period = Column(Integer)
 
     #Relationship
-    #reference = relationship("Employee",back_populates="candidate")
+    job_has_candidate = relationship("Job_Has_Candidate",back_populates="candidate")
 
     def __init__(self,name=None, skills=None,experience=None,email=None,address=None,mobileno=None,source=None,reffered_by=None,resume=None,status=None,current_ctc=None,expected_ctc=None,current_organization=None,notice_period=None):
 
@@ -167,7 +167,7 @@ class JobPosition(Base):
     project = relationship(Project, back_populates="job_positions", uselist=False)
     employee = relationship(Employee, back_populates="job_positions", uselist=False)
 
-    def __init__(self, title, experience, skill, no_of_openings, status, grade):
+    def __init__(self, title=None, experience=None, skill=None, no_of_openings=None, status=None, grade=None):
         self.title = title
         self.experience = experience
         self.skills = skill
@@ -189,7 +189,6 @@ class JobPosition(Base):
             "project_id":self.project_id
         }
 
-    @property
     def deserialize(self, data):
         self.employee_id = data['employee_id']
         self.title = data['title']
@@ -207,6 +206,25 @@ class JobHasCandidate(Base):
     candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0)
     position_id = Column(Integer, ForeignKey("job_position.id"), default=0)
 
+     # Relationship
+     candidate = relationship("Candidate", back_populates="job_has_candidate")
+
+    def __init__(self,candidate_id=None, position_id=None):
+        self.candidate_id=candidate_id
+        self.position_id=position_id
+
+
+    def serialize(self):
+        return {
+         'id' : self.id,
+         'Candidate id': self.candidate_id,
+         'Job Position id': self.position_id
+        }
+
+    def deserialize(self, job_has_candidate_json):
+        self.id = job_has_candidate_json.get('id')
+        self.candidate_id = job_has_candidate_json.get('candidate_id')
+        self.position_id= job_has_candidate_json.get('position_id')
 
 class Interview(Base):
     __tablename__ = "interview"
