@@ -25,18 +25,26 @@ def get_positions():
 
 @app.route('/positions', methods=['POST'])
 def create_position():
-    jp = JobPosition()
-    data = request.get_json()
-    jp.deserialize(data)
-    session.add(jp)
-    session.commit()
-    return jsonify(jp.serialize), 201
+    try:
+        jp = JobPosition()
+        data = request.get_json()
+        jp.deserialize(data)
+        session.add(jp)
+        session.commit()
+        return jsonify(jp.serialize), 201
+    except:
+        True
+    finally:
+        session.rollback()
+        return jsonify({})
 
 @app.route('/positions/<id>', methods=['GET'])
 def get_position_by_id(id):
     result = session.query(JobPosition).get(id)
-    return jsonify(result.serialize)
-
+    if result:
+        return jsonify(result.serialize)
+    else:
+        return jsonify({})
 
 @app.route('/positions/skill/<skills>', methods=['GET'])
 def get_position_by_skill(skills):
@@ -73,36 +81,47 @@ def get_position_by_experience(experience):
 
 @app.route('/positions/update/<id>', methods=['PUT'])
 def update_position_by_id(id):
-    jobPosition = session.query(JobPosition).get(id)
-    data = request.get_json()
-    print(type(data))
-    if 'skills' in data:
-        jobPosition.skills = data['skills']
-    if 'experience' in data:
-        jobPosition.experience = data['experience']
-    if 'no_of_openings' in data:
-        jobPosition.no_of_openings = data['no_of_openings']
-    if 'title' in data:
-        jobPosition.title = data['title']
-    if 'status' in data:
-        jobPosition.status = data['status']
-    if 'grade' in data:
-        jobPosition.grade = data['grade']
-    if 'project_id' in data:
-        jobPosition.project_id = data['project_id']
-    if 'employee_id' in data:
-        jobPosition.employee_id = data['employee_id']
+    try:
+        jobPosition = session.query(JobPosition).get(id)
+        data = request.get_json()
+        print(type(data))
+        if 'skills' in data:
+            jobPosition.skills = data['skills']
+        if 'experience' in data:
+            jobPosition.experience = data['experience']
+        if 'no_of_openings' in data:
+            jobPosition.no_of_openings = data['no_of_openings']
+        if 'title' in data:
+            jobPosition.title = data['title']
+        if 'status' in data:
+            jobPosition.status = data['status']
+        if 'grade' in data:
+            jobPosition.grade = data['grade']
+        if 'project_id' in data:
+            jobPosition.project_id = data['project_id']
+        if 'employee_id' in data:
+            jobPosition.employee_id = data['employee_id']
 
-    session.commit()
-    return jsonify(jobPosition.serialize)
-
+        session.commit()
+        return jsonify(jobPosition.serialize)
+    except:
+        True
+    finally:
+        session.rollback()
+        return jsonify({})
 
 @app.route('/positions/<id>', methods=['DELETE'])
 def delete_position_by_id(id):
-    jobPosition = session.query(JobPosition).get(id)
-    session.delete(jobPosition)
-    session.commit()
-    return jsonify({'response': 'Success'})
+    try:
+        jobPosition = session.query(JobPosition).get(id)
+        session.delete(jobPosition)
+        session.commit()
+        return jsonify({'response': 'Success'})
+    except:
+        True
+    finally:
+        session.rollback()
+        return jsonify({})
 
 @app.errorhandler(404)
 def not_found(error):
