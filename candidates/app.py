@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,abort
 from sqlalchemy import create_engine,update,and_
 from models import Employee,Candidate,JobHasCandidate,JobPosition
 from sqlalchemy.orm import sessionmaker
@@ -28,125 +28,145 @@ def post_candidate():
         return jsonify(c.serialize())
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
+        return jsonify({'Response': 'Not created'}), 500
 
 
 #Get Candidate Information
 @app.route('/candidates/<id>', methods=['GET'])
 def get_candidate(id):
     try:
-        id=session.query(Candidate).get(id)
-        return jsonify(id.serialize())
+        candidate_record = session.query(Candidate).get(id)
+        if candidate_record:
+            return jsonify(candidate_record.serialize())
+        else:
+            return jsonify({})
+
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
-       # return "False"
+        return jsonify({'Response': 'Id not found'}), 500
+
+
 
 #Update Candidate
 @app.route('/candidates/<id>', methods = ['PUT'])
 def update_candidate(id):
     try:
         print("id =" + id)
-        db_value = session.query(Candidate).get(id)
-        k = request.json
-        #body = request.get_json()
-        print(db_value.serialize())
-        # c = Candidate()
-        db_value.deserialize(k)
-        session.commit()
-        return jsonify(db_value.serialize())
+        candidate_record = session.query(Candidate).get(id)
+        if candidate_record:
+            k = request.json
+            #body = request.get_json()
+            print(candidate_record.serialize())
+            # c = Candidate()
+            candidate_record.deserialize(k)
+            session.commit()
+            return jsonify(candidate_record.serialize())
+        else:
+            return jsonify({})
+
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
-        #return "False"
+        return jsonify({'Response': 'Id not found'}), 500
 
 
 #Delete Candidate
 @app.route('/candidates/<id>', methods = ['DELETE'])
 def delete_candidate(id):
     try:
-        d = session.query(Candidate).get(id)
-        session.delete(d)
-        session.commit()
-        return {"Status":"Deleted Successfully"}
+        candidate_record = session.query(Candidate).get(id)
+        if candidate_record:
+            session.delete(candidate_record)
+            session.commit()
+            return {"response":"Deleted Successfully"}
+        else:
+            return jsonify({})
+
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
-        #return "False"
-
+        return jsonify({'Response': 'Id not found'}), 500
 
 #Get all Candidate
-@app.route('/candidates/all', methods=["GET"])
+@app.route('/candidates/', methods=["GET"])
 def candidate_all():
-    try:
-        tmp_list = []
-        stmt = session.query(Candidate).all()
-        for result in stmt:
+    # try:
+    tmp_list = []
+    candidate_record = session.query(Candidate).all()
+    if candidate_record:
+        for result in candidate_record:
              tmp_list.append(result.serialize())
         return jsonify(tmp_list)
-    except Exception as e:
-        print(e)
-    finally:
-        session.rollback()
-        #return "False"
+    else:
+        return jsonify({})
+    # except Exception as e:
+    #     print(e)
+    # finally:
+    #     session.rollback()
+    #     return "False"
 
 
 #Get candidate By Source
-@app.route('/candidates/source/<sourceid>', methods=['GET'])
-def get_candidate_by_source(sourceid):
-    try:
-        print(sourceid)
-        source=session.query(Candidate).filter(Candidate.source==sourceid)
+@app.route('/candidates/source/<sourcename>', methods=['GET'])
+def get_candidate_by_source(sourcename):
+    # try:
+        #print(sourcename)
+    source=session.query(Candidate).filter(Candidate.source==sourcename)
+    if source:
         candidate_list = []
         for value in source:
             candidate_list.append(value.serialize())
         return jsonify(candidate_list)
-    except Exception as e:
-        print(e)
-    finally:
-        session.rollback()
-        #return ""
+    else:
+        return jsonify({})
 
 
 #Get candidate by Status
 @app.route('/candidates/status/<status>', methods=['GET'])
 def get_candidate_by_status(status):
-    try:
-        status=session.query(Candidate).filter(Candidate.status==status)
+    # try:
+    status=session.query(Candidate).filter(Candidate.status==status)
+    if status:
         candidate_list = []
         for value in status:
             candidate_list.append(value.serialize())
         return jsonify(candidate_list)
-    except Exception as e:
-        print(e)
-    finally:
-        session.rollback()
+    else:
+        return jsonify({})
+    # except Exception as e:
+    #     print(e)
+    # finally:
+    #     session.rollback()
         #return "False"
 
 
 #Get Shortlisted candidates for Job
-@app.route('/candidates/job/<job_id>')
-def get_candidate_by_job_id(job_id):
-    try:
-        candidate_list = []
-        return_job = session.query(JobHasCandidate).filter(JobHasCandidate.position_id == job_id)
+@app.route('/candidates/<id>/positions', methods=['GET'])
+def get_job_by_candidate_id(id):
+    # try:
+    job_list = []
+    return_job = session.query(JobHasCandidate).filter(JobHasCandidate.candidate_id == id)
+    if return_job:
         for row in return_job:
-          candidateid = row.candidate_id
-          print(candidateid)
-          # get list of candidate for that jobid
-          result = session.query(Candidate).filter(and_(Candidate.id == candidateid , Candidate.status=="Shortlisted")).all()
-          # Loop through  candidate list, convert to json and add to result list
-          for candidate in result:
-              candidate_list.append(candidate.serialize())
-        return jsonify(candidate_list)
-    except Exception as e:
-        print(e)
-    finally:
-        session.rollback()
+            # print(row.jobposition.serialize)
+            positionid = row.position_id
+            print(positionid)
+            # result = session.query(JobPosition).filter(JobPosition.id == positionid).all()
+            # for job in result:
+            job_list.append(row.jobposition.serialize)
+        return jsonify(job_list)
+    else:
+        return jsonify({})
+    # except Exception as e:
+    #     print(e)
+    # finally:
+    #     session.rollback()
         #return "False"
 
 
@@ -164,25 +184,30 @@ def post_job_has_candidate():
         return jsonify(c.serialize())
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
-        #return "false"
+        return jsonify({})
 
 #Upload Resume
 @app.route('/candidates/resume/<id>', methods = ['POST'])
 def resume_upload(id):
     try:
         candidate = session.query(Candidate).get(id)
-        f = request.files['resume']
-        f.save('resume/' + f.filename)
-        candidate.resume = 'resume/' + f.filename
-        session.commit()
-        return {"id": id,"status": "Resume Uploaded"}
+        if candidate:
+            f = request.files['resume']
+            f.save('temp/' + f.filename)
+            candidate.resume = 'temp/' + f.filename
+            session.commit()
+            return {"id": id,"Response": "Resume Uploaded"}
+        else:
+            return jsonify({})
     except Exception as e:
         print(e)
-    finally:
+    # finally:
         session.rollback()
-        #return "False"
+        return jsonify({'response': 'Id not found'}), 500
+
+        # return jsonify({})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000,debug=True)
