@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, abort, make_response
 import json
-from models import Project, JobPosition
+from models import Project, JobPosition, Employee
 from sqlalchemy.orm import relationship, Session, sessionmaker
 from sqlalchemy import create_engine
 from flask_cors import CORS
@@ -13,6 +13,22 @@ engine = create_engine("mysql+pymysql://root:tos1byte@localhost/ats")
 Session = sessionmaker(bind=engine)
 session = Session()
 
+
+@app.route('/projects')
+def get_projects():
+    resList = []
+    result = session.query(Project).all()
+    for row in result:
+        resList.append(row.serialize)
+    return jsonify(resList)
+
+@app.route('/employees')
+def get_employees():
+    resList = []
+    result = session.query(Employee).all()
+    for row in result:
+        resList.append(row.serialize)
+    return jsonify(resList)
 
 @app.route('/positions')
 def get_positions():
@@ -32,11 +48,10 @@ def create_position():
         session.add(jp)
         session.commit()
         return jsonify(jp.serialize), 201
-    except:
-        True
-    finally:
+    except Exception as e:
+        print(e)
         session.rollback()
-        return jsonify({})
+        return jsonify({}), 500
 
 @app.route('/positions/<id>', methods=['GET'])
 def get_position_by_id(id):
@@ -84,7 +99,6 @@ def update_position_by_id(id):
     try:
         jobPosition = session.query(JobPosition).get(id)
         data = request.get_json()
-        print(type(data))
         if 'skills' in data:
             jobPosition.skills = data['skills']
         if 'experience' in data:
@@ -104,11 +118,10 @@ def update_position_by_id(id):
 
         session.commit()
         return jsonify(jobPosition.serialize)
-    except:
-        True
-    finally:
+    except Exception as e:
+        print(e)
         session.rollback()
-        return jsonify({})
+        return jsonify({}), 500
 
 @app.route('/positions/<id>', methods=['DELETE'])
 def delete_position_by_id(id):
@@ -117,11 +130,10 @@ def delete_position_by_id(id):
         session.delete(jobPosition)
         session.commit()
         return jsonify({'response': 'Success'})
-    except:
-        True
-    finally:
+    except Exception as e:
+        print(e)
         session.rollback()
-        return jsonify({})
+        return jsonify({'response': 'Id not found'}), 500
 
 @app.errorhandler(404)
 def not_found(error):

@@ -41,10 +41,11 @@ class Employee(Base):
     @property
     def serialize(self):
         return {
+            "id": self.id,
             "name": self.name,
             "email": self.email,
             "address": self.address,
-            "mobileno": self.mobileno,
+            "mobileno": self.mobileno
         }
 
 
@@ -149,7 +150,7 @@ class Project(Base):
 
     @property
     def serialize(self):
-        return {"name": self.name}
+        return {"name": self.name,'id':self.id}
 
 
 class JobPosition(Base):
@@ -161,8 +162,8 @@ class JobPosition(Base):
     no_of_openings = Column(Integer, nullable=False, default=1)
     status = Column(String(30), nullable=False, default="OPEN")
     grade = Column(String(5), nullable=False)
-    project_id = Column(Integer, ForeignKey("project.id"))
-    employee_id = Column(Integer, ForeignKey("employee.id"))  # Hiring manager id
+    project_id = Column(Integer, ForeignKey("project.id"),nullable=True)
+    employee_id = Column(Integer, ForeignKey("employee.id"),nullable=True)  # Hiring manager id
 
     project = relationship(Project, back_populates="job_positions", uselist=False)
     employee = relationship(Employee, back_populates="job_positions", uselist=False)
