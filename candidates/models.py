@@ -1,7 +1,7 @@
 from datetime import datetime
 from pprint import pprint
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Enum, Boolean, Text,BLOB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import json
@@ -67,12 +67,12 @@ class Candidate(Base):
                   nullable=True)
     experience = Column(Integer,
                   nullable=False)
-    source = Column(String(100))
+    source = Column(String(30),nullable=True)
     reffered_by = Column(Integer,
                    ForeignKey('employee.id'),
                    nullable=False)
-    resume = Column(String(50),
-                  nullable=False)
+    resume = Column(String(100),
+                  nullable=True)
     status = Column(String(100),
                   nullable=False)
     current_ctc = Column(Integer)
@@ -81,11 +81,11 @@ class Candidate(Base):
 
     notice_period = Column(Integer)
 
-    #Relationship
+
+     # Relationship
     job_has_candidate = relationship("JobHasCandidate",back_populates="candidate")
 
     def __init__(self,name=None, skills=None,experience=None,email=None,address=None,mobileno=None,source=None,reffered_by=None,resume=None,status=None,current_ctc=None,expected_ctc=None,current_organization=None,notice_period=None):
-
         self.name=name
         self.email=email
         self.address=address
@@ -166,6 +166,7 @@ class JobPosition(Base):
 
     project = relationship(Project, back_populates="job_positions", uselist=False)
     employee = relationship(Employee, back_populates="job_positions", uselist=False)
+    job_has_candidate=relationship("JobHasCandidate",back_populates="jobposition",uselist=False)
 
     def __init__(self, title=None, experience=None, skill=None, no_of_openings=None, status=None, grade=None):
         self.title = title
@@ -203,16 +204,12 @@ class JobPosition(Base):
 class JobHasCandidate(Base):
     __tablename__ = "job_has_candidate"
     id = Column(Integer, primary_key=True)
-    candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0)
-    position_id = Column(Integer, ForeignKey("job_position.id"), default=0)
+    candidate_id = Column(Integer, ForeignKey("candidate.id"), default=0, nullable=False)
+    position_id = Column(Integer, ForeignKey("job_position.id"), default=0,nullable=False)
     # Relationship
-    candidate = relationship(Candidate, back_populates="job_has_candidate")
+    candidate = relationship("Candidate", back_populates="job_has_candidate")
+    jobposition=relationship("JobPosition",back_populates="job_has_candidate")
     interviews = relationship("Interview",back_populates="job_has_candidate")
-
-    def __init__(self,candidate_id=None, position_id=None):
-        self.candidate_id=candidate_id
-        self.position_id=position_id
-
 
     def serialize(self):
         return {
@@ -265,15 +262,3 @@ class Interview(Base):
 JobHasCandidate.interviews = relationship(Interview, order_by = Interview.id, back_populates="job_has_candidate", uselist=False)
 Employee.interviews = relationship(Interview, order_by = Interview.id, back_populates="employee", uselist=False)
 
-
-if __name__ == "__main__":
-    # engine = create_engine(
-    #     "sqlite:///ats.db", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    # )
-    engine = create_engine("mysql+pymysql://dhruv:dhruv@localhost/ats")
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine, expire_on_commit=False)
-    session = Session()
-
-    for a in session.query(Employee).all():
-        print(a.serialize())
