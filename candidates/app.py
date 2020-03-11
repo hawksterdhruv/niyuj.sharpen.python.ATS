@@ -204,7 +204,20 @@ def resume_upload(id):
         session.rollback()
         return jsonify({'response': 'Id not found'}), 500
 
-        # return jsonify({})
+
+#Retrieve Resume
+@app.route('/candidates/resume/<id>', methods=['GET'])
+def download_resume(id):
+    try:
+        candidate = session.query(Candidate).get(id)
+        resume=candidate.resume
+        #print(resume)
+        return send_file('/home/ubuntu/niyuj.sharpen.python.ATS/candidates/'+resume,mimetype='multipart/form-data')
+        #return ""
+    except Exception as e:
+        print(e)
+        session.rollback()
+        return jsonify({'response': 'Id not found'}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000,debug=True)
