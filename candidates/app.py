@@ -172,7 +172,7 @@ def get_job_by_candidate_id(id):
 
 
 #Create Job_Has_Candidate
-@app.route("/job_has_candidate", methods = ["POST"])
+@app.route("/candidates/job_has_candidate", methods = ["POST"])
 def post_job_has_candidate():
     try:
         j_has_c = request.get_json()
