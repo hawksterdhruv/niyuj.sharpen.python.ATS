@@ -193,14 +193,11 @@ def post_job_has_candidate():
 def resume_upload(id):
     try:
         candidate = session.query(Candidate).get(id)
-        if candidate:
-            f = request.files['resume']
-            f.save('temp/' + f.filename)
-            candidate.resume = 'temp/' + f.filename
-            session.commit()
-            return {"id": id,"Response": "Resume Uploaded"}
-        else:
-            return jsonify({})
+        f = request.files['resume']
+        f.save('resume/' + f.filename)
+        candidate.resume = 'resume/' + f.filename
+        session.commit()
+        return {"id": id,"Response": "Resume Uploaded"}
     except Exception as e:
         print(e)
     # finally:
