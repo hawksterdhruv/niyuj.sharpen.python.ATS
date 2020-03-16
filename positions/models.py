@@ -184,7 +184,7 @@ class JobPosition(Base):
             "experience": self.experience,
             "skills": self.skills,
             "no_of_openings": self.no_of_openings,
-            "status": self.no_of_openings,
+            "status": self.status,
             "grade": self.grade,
             "employee_id":self.employee_id,
             "project_id":self.project_id
